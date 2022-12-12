@@ -28,13 +28,12 @@ app.get("/api/auth", async (req, res, next) => {
   }
 });
 
-app.get("/api/notes/:userId", async (req, res, next) => {
+app.get("/api/auth/:userId/notes", async (req, res, next) => {
   try {
-    const data = await User.findOne({
-      where: { id: `${req.params.userId}` },
-      include: Note,
-    });
-    res.send(data.notes);
+    const { notes } = await User.byTokenInclude(req.headers.authorization);
+    // include: Note,
+    // });
+    res.send(notes);
   } catch (ex) {
     next(ex);
   }

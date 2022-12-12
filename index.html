@@ -43,8 +43,11 @@
         const [auth, setAuth] = React.useState({});
         const [notes, setNotes] = React.useState([]);
 
-        const getNotes = async (userId) => {
-          const { data } = await axios.get(`/api/notes/${userId}`);
+        const getNotes = async (userId, token) => {
+          const { data } = await axios.get(`/api/auth/${userId}/notes`, {
+              headers: {
+                authorization: token,
+              }})
           setNotes(data);
         };
 
@@ -56,7 +59,7 @@
                 authorization: token,
               },
             });
-            getNotes(auth.id);
+            getNotes(auth.id, token);
             setAuth(auth);
           }
         };
@@ -77,12 +80,18 @@
           attemptTokenLogin();
         };
 
-        console.log(notes);
         if (!auth.id) return <SignIn signIn={signIn} />;
 
         return (
           <div>
             Welcome {auth.username}!<button onClick={logout}>Logout</button>
+            <div>
+              <ul>
+              { notes && notes.length ? notes.map(note => (
+                <li key={note.id}>{note.text}</li>
+              )) : null }
+              </ul>
+              </div>
           </div>
         );
       };

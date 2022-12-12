@@ -36,9 +36,19 @@ User.byToken = async (token) => {
     const isVerified = jwt.verify(token, SECRET_WORD);
     const { id } = isVerified;
     return await User.findByPk(id);
+  } catch (ex) {
     const error = Error("bad credentials");
     error.status = 401;
-    throw error;
+  }
+};
+
+User.byTokenInclude = async (token) => {
+  try {
+    const isVerified = jwt.verify(token, SECRET_WORD);
+    const { id } = isVerified;
+    const user = await User.findOne({ where: { id }, include: Note });
+
+    return user;
   } catch (ex) {
     const error = Error("bad credentials");
     error.status = 401;
