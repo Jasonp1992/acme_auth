@@ -30,9 +30,10 @@ app.get("/api/auth", async (req, res, next) => {
 
 app.get("/api/auth/:userId/notes", async (req, res, next) => {
   try {
-    const { notes } = await User.byTokenInclude(req.headers.authorization);
-    // include: Note,
-    // });
+    const { notes } = await User.byTokenIncludeNotes(
+      req.headers.authorization,
+      req.params.userId
+    );
     res.send(notes);
   } catch (ex) {
     next(ex);

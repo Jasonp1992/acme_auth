@@ -42,12 +42,12 @@ User.byToken = async (token) => {
   }
 };
 
-User.byTokenInclude = async (token) => {
+User.byTokenIncludeNotes = async (token, userId) => {
   try {
     const isVerified = jwt.verify(token, SECRET_WORD);
     const { id } = isVerified;
+    if (id !== Number(userId)) throw new Error("User id doesnt match");
     const user = await User.findOne({ where: { id }, include: Note });
-
     return user;
   } catch (ex) {
     const error = Error("bad credentials");
