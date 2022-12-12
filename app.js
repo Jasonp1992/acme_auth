@@ -6,6 +6,16 @@ const {
 const path = require("path");
 require("dotenv").config();
 
+const requireToken = async (req, res, next) => {
+  try {
+    const data = await User.byToken(req.headers.authorization);
+    req.user = data;
+    next();
+  } catch (error) {
+    next(error);
+  }
+};
+
 // middleware
 app.use(express.json());
 
@@ -20,21 +30,21 @@ app.post("/api/auth", async (req, res, next) => {
   }
 });
 
-app.get("/api/auth", async (req, res, next) => {
+app.get("/api/auth", requireToken, async (req, res, next) => {
   try {
-    res.send(await User.byToken(req.headers.authorization));
+    res.send(req.user);
   } catch (ex) {
     next(ex);
   }
 });
 
-app.get("/api/auth/:userId/notes", async (req, res, next) => {
+app.get("/api/auth/:userId/notes", requireToken, async (req, res, next) => {
   try {
-    const { notes } = await User.byTokenIncludeNotes(
-      req.headers.authorization,
-      req.params.userId
-    );
-    res.send(notes);
+    if (req.user.id === Number(req.params.userId)) {
+      res.send(req.user.notes);
+    } else {
+      throw new Error("User id doesnt match");
+    }
   } catch (ex) {
     next(ex);
   }
