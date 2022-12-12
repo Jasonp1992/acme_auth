@@ -41,6 +41,12 @@
 
       const App = () => {
         const [auth, setAuth] = React.useState({});
+        const [notes, setNotes] = React.useState([]);
+
+        const getNotes = async (userId) => {
+          const { data } = await axios.get(`/api/notes/${userId}`);
+          setNotes(data);
+        };
 
         const attemptTokenLogin = async () => {
           const token = window.localStorage.getItem("token");
@@ -50,9 +56,11 @@
                 authorization: token,
               },
             });
+            getNotes(auth.id);
             setAuth(auth);
           }
         };
+
         React.useEffect(() => {
           attemptTokenLogin();
         }, []);
@@ -69,7 +77,7 @@
           attemptTokenLogin();
         };
 
-        console.log(auth);
+        console.log(notes);
         if (!auth.id) return <SignIn signIn={signIn} />;
 
         return (
